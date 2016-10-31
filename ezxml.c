@@ -47,26 +47,26 @@
 
 __inline int c99_vsnprintf(char *outBuf, size_t size, const char *format, va_list ap)
 {
-	int count = -1;
+    int count = -1;
 
-	if (size != 0)
-		count = _vsnprintf_s(outBuf, size, _TRUNCATE, format, ap);
-	if (count == -1)
-		count = _vscprintf(format, ap);
+    if (size != 0)
+        count = _vsnprintf_s(outBuf, size, _TRUNCATE, format, ap);
+    if (count == -1)
+        count = _vscprintf(format, ap);
 
-	return count;
+    return count;
 }
 
 __inline int c99_snprintf(char *outBuf, size_t size, const char *format, ...)
 {
-	int count;
-	va_list ap;
+    int count;
+    va_list ap;
 
-	va_start(ap, format);
-	count = c99_vsnprintf(outBuf, size, format, ap);
-	va_end(ap);
+    va_start(ap, format);
+    count = c99_vsnprintf(outBuf, size, format, ap);
+    va_end(ap);
 
-	return count;
+    return count;
 }
 
 #endif
@@ -74,7 +74,7 @@ __inline int c99_snprintf(char *outBuf, size_t size, const char *format, ...)
 // NOTE(rgriege): compatability
 static int _isspace_compat(char ch)
 {
-	return isspace((unsigned char)ch);
+    return isspace((unsigned char)ch);
 }
 
 #define EZXML_WS   "\t\r\n "  // whitespace
@@ -403,7 +403,7 @@ short ezxml_internal_dtd(ezxml_root_t root, char *s, size_t len)
             else *s = '\0'; // null terminate tag name
             for (i = 0; root->attr[i] && strcmp(n, root->attr[i][0]); i++);
 
-			++s; // NOTE(rgriege) gcc issued sequence error here
+            ++s; // NOTE(rgriege) gcc issued sequence error here
             while (*(n = s + strspn(s, EZXML_WS)) && *n != '>') {
                 if (*(s = n + strcspn(n, EZXML_WS))) *s = '\0'; // attr name
                 else { ezxml_err(root, t, "malformed <!ATTLIST"); break; }
@@ -445,7 +445,7 @@ short ezxml_internal_dtd(ezxml_root_t root, char *s, size_t len)
                 root->attr[i][j + 1] = (v) ? ezxml_decode(v, root->ent, *c)
                                            : NULL;
                 root->attr[i][j] = n; // attribute name 
-				++s;
+                ++s;
             }
         }
         else if (! strncmp(s, "<!--", 4)) s = strstr(s + 4, "-->"); // comments
@@ -667,7 +667,7 @@ ezxml_t ezxml_parse_fp(FILE *fp)
 // a wrapper for ezxml_parse_fd that accepts a file name
 ezxml_t ezxml_parse_file(const char *file)
 {
-	FILE * fp = fopen(file, "r");
+    FILE * fp = fopen(file, "r");
     ezxml_t xml = ezxml_parse_fp(fp);
     
     if (fp >= 0) fclose(fp);
@@ -918,32 +918,32 @@ ezxml_t ezxml_add_child(ezxml_t xml, const char *name, size_t off)
 // Appends a child tag with indentation.
 ezxml_t ezxml_append_child(ezxml_t xml, const char *name, short spaces)
 {
-	ezxml_t parent = xml;
-	size_t tsz = xml->txt ? strlen(xml->txt) : 0, depth = 0;
-	char c = spaces ? ' ' : '\t', *txt;
+    ezxml_t parent = xml;
+    size_t tsz = xml->txt ? strlen(xml->txt) : 0, depth = 0;
+    char c = spaces ? ' ' : '\t', *txt;
 
-	if (! xml) return NULL;
+    if (! xml) return NULL;
 
-	while ((parent = parent->parent)) ++depth;
-	if (spaces) depth *= spaces;
+    while ((parent = parent->parent)) ++depth;
+    if (spaces) depth *= spaces;
 
-	if (!(xml->flags & EZXML_TXTM)) {
-		ezxml_set_flag(xml, EZXML_TXTM);
-		txt = malloc(tsz + 2 * depth + 2);
-		memcpy(txt, xml->txt, tsz);
-		xml->txt = txt;
-	}
-	else xml->txt = realloc(xml->txt, tsz + 2 * depth + 2);
+    if (!(xml->flags & EZXML_TXTM)) {
+        ezxml_set_flag(xml, EZXML_TXTM);
+        txt = malloc(tsz + 2 * depth + 2);
+        memcpy(txt, xml->txt, tsz);
+        xml->txt = txt;
+    }
+    else xml->txt = realloc(xml->txt, tsz + 2 * depth + 2);
 
-	txt = xml->txt + tsz;
-	memset(txt, c, depth);
-	txt += depth;
-	*txt++ = '\n';
-	memset(txt, c, depth);
-	txt += depth;
-	*txt = '\0';
+    txt = xml->txt + tsz;
+    memset(txt, c, depth);
+    txt += depth;
+    *txt++ = '\n';
+    memset(txt, c, depth);
+    txt += depth;
+    *txt = '\0';
 
-	return ezxml_add_child(xml, name, tsz + depth);
+    return ezxml_add_child(xml, name, tsz + depth);
 }
 
 // sets the character content for the given tag and returns the tag

@@ -139,6 +139,9 @@ ezxml_t ezxml_add_child(ezxml_t xml, const char *name, size_t off);
 #define ezxml_add_child_d(xml, name, off) \
     ezxml_set_flag(ezxml_add_child(xml, ezxml_strdup(name), off), EZXML_NAMEM)
 
+// Appends a child tag with indentation.
+ezxml_t ezxml_append_child(ezxml_t xml, const char *name, short spaces);
+
 // sets the character content for the given tag and returns the tag
 ezxml_t ezxml_set_txt(ezxml_t xml, const char *txt);
 

@@ -37,13 +37,6 @@
 #include <sys/stat.h>
 #include "ezxml.h"
 
-// NOTE(rgriege): compatability
-static char * _strdup_compat(const char * s)
-{
-	char * res = malloc(strlen(s) + 1);
-	strcpy(res, s);
-	return res;
-}
 
 // NOTE(rgriege): compatability
 // http://stackoverflow.com/questions/2915672/snprintf-and-visual-studio-2010
@@ -353,7 +346,7 @@ void ezxml_proc_inst(ezxml_root_t root, char *s, size_t len)
         root->pi[i] = malloc(sizeof(char *) * 3);
         root->pi[i][0] = target;
         root->pi[i][1] = (char *)(root->pi[i + 1] = NULL); // terminate pi list
-        root->pi[i][2] = _strdup_compat(""); // empty document position list
+        root->pi[i][2] = ezxml_strdup(""); // empty document position list
     }
 
     while (root->pi[i][j]) j++; // find end of instruction list for this target
@@ -944,7 +937,7 @@ ezxml_t ezxml_set_attr(ezxml_t xml, const char *name, const char *value)
         if (! value) return xml; // nothing to do
         if (xml->attr == EZXML_NIL) { // first attribute
             xml->attr = malloc(4 * sizeof(char *));
-            xml->attr[1] = _strdup_compat(""); // empty list of malloced names/vals
+            xml->attr[1] = ezxml_strdup(""); // empty list of malloced names/vals
         }
         else xml->attr = realloc(xml->attr, (l + 4) * sizeof(char *));
 

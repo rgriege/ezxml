@@ -915,6 +915,37 @@ ezxml_t ezxml_add_child(ezxml_t xml, const char *name, size_t off)
     return ezxml_insert(child, xml, off);
 }
 
+// Appends a child tag with indentation.
+ezxml_t ezxml_append_child(ezxml_t xml, const char *name, short spaces)
+{
+	ezxml_t parent = xml;
+	size_t tsz = xml->txt ? strlen(xml->txt) : 0, depth = 0;
+	char c = spaces ? ' ' : '\t', *txt;
+
+	if (! xml) return NULL;
+
+	while ((parent = parent->parent)) ++depth;
+	if (spaces) depth *= spaces;
+
+	if (!(xml->flags & EZXML_TXTM)) {
+		ezxml_set_flag(xml, EZXML_TXTM);
+		txt = malloc(tsz + 2 * depth + 2);
+		memcpy(txt, xml->txt, tsz);
+		xml->txt = txt;
+	}
+	else xml->txt = realloc(xml->txt, tsz + 2 * depth + 2);
+
+	txt = xml->txt + tsz;
+	memset(txt, c, depth);
+	txt += depth;
+	*txt++ = '\n';
+	memset(txt, c, depth);
+	txt += depth;
+	*txt = '\0';
+
+	return ezxml_add_child(xml, name, tsz + depth);
+}
+
 // sets the character content for the given tag and returns the tag
 ezxml_t ezxml_set_txt(ezxml_t xml, const char *txt)
 {

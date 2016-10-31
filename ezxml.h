@@ -35,13 +35,18 @@ extern "C" {
 #endif
 
 
+#ifndef ezxml_strup
 #ifdef _WIN32
-static char *ezxml_strdup(const char *s)
+static char *_ezxml_strdup(const char *s)
 {
 	char *res = malloc(strlen(s) + 1);
 	strcpy(res, s);
 	return res;
 }
+#define ezxml_strdup _ezxml_strdup
+#else
+#define ezxml_strdup strdup
+#endif
 #endif
 
 #define EZXML_BUFSIZE 1024 // size of internal memory buffers

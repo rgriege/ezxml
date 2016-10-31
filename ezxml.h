@@ -34,6 +34,21 @@
 extern "C" {
 #endif
 
+
+#ifndef ezxml_strup
+#ifdef _WIN32
+static char *_ezxml_strdup(const char *s)
+{
+	char *res = malloc(strlen(s) + 1);
+	strcpy(res, s);
+	return res;
+}
+#define ezxml_strdup _ezxml_strdup
+#else
+#define ezxml_strdup strdup
+#endif
+#endif
+
 #define EZXML_BUFSIZE 1024 // size of internal memory buffers
 #define EZXML_NAMEM   0x80 // name is malloced
 #define EZXML_TXTM    0x40 // txt is malloced
@@ -114,7 +129,7 @@ const char *ezxml_error(ezxml_t xml);
 ezxml_t ezxml_new(const char *name);
 
 // wrapper for ezxml_new() that strdup()s name
-#define ezxml_new_d(name) ezxml_set_flag(ezxml_new(strdup(name)), EZXML_NAMEM)
+#define ezxml_new_d(name) ezxml_set_flag(ezxml_new(ezxml_strdup(name)), EZXML_NAMEM)
 
 // Adds a child tag. off is the offset of the child tag relative to the start
 // of the parent tag's character content. Returns the child tag.
@@ -122,14 +137,17 @@ ezxml_t ezxml_add_child(ezxml_t xml, const char *name, size_t off);
 
 // wrapper for ezxml_add_child() that strdup()s name
 #define ezxml_add_child_d(xml, name, off) \
-    ezxml_set_flag(ezxml_add_child(xml, strdup(name), off), EZXML_NAMEM)
+    ezxml_set_flag(ezxml_add_child(xml, ezxml_strdup(name), off), EZXML_NAMEM)
+
+// Appends a child tag with indentation.
+ezxml_t ezxml_append_child(ezxml_t xml, const char *name, short spaces);
 
 // sets the character content for the given tag and returns the tag
 ezxml_t ezxml_set_txt(ezxml_t xml, const char *txt);
 
 // wrapper for ezxml_set_txt() that strdup()s txt
 #define ezxml_set_txt_d(xml, txt) \
-    ezxml_set_flag(ezxml_set_txt(xml, strdup(txt)), EZXML_TXTM)
+    ezxml_set_flag(ezxml_set_txt(xml, ezxml_strdup(txt)), EZXML_TXTM)
 
 // Sets the given tag attribute or adds a new attribute if not found. A value
 // of NULL will remove the specified attribute. Returns the tag given.
@@ -137,7 +155,7 @@ ezxml_t ezxml_set_attr(ezxml_t xml, const char *name, const char *value);
 
 // Wrapper for ezxml_set_attr() that strdup()s name/value. Value cannot be NULL
 #define ezxml_set_attr_d(xml, name, value) \
-    ezxml_set_attr(ezxml_set_flag(xml, EZXML_DUP), strdup(name), strdup(value))
+    ezxml_set_attr(ezxml_set_flag(xml, EZXML_DUP), ezxml_strdup(name), ezxml_strdup(value))
 
 // sets a flag for the given tag and returns the tag
 ezxml_t ezxml_set_flag(ezxml_t xml, short flag);

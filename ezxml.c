@@ -919,31 +919,38 @@ ezxml_t ezxml_add_child(ezxml_t xml, const char *name, size_t off)
 ezxml_t ezxml_append_child(ezxml_t xml, const char *name, short spaces)
 {
     ezxml_t parent = xml;
-    size_t tsz = xml->txt ? strlen(xml->txt) : 0, depth = 0;
+    size_t tsz = xml->txt ? strlen(xml->txt) : 0, depth = 1, parent_depth, off;
     char c = spaces ? ' ' : '\t', *txt;
 
     if (! xml) return NULL;
 
     while ((parent = parent->parent)) ++depth;
-    if (spaces) depth *= spaces;
+    parent_depth = depth - 1;
+    if (spaces) {
+        depth *= spaces;
+        parent_depth *= spaces;
+    }
 
     if (!(xml->flags & EZXML_TXTM)) {
         ezxml_set_flag(xml, EZXML_TXTM);
-        txt = malloc(tsz + 2 * depth + 2);
+        txt = malloc(tsz + depth + parent_depth + 3);
         memcpy(txt, xml->txt, tsz);
         xml->txt = txt;
     }
-    else xml->txt = realloc(xml->txt, tsz + 2 * depth + 2);
+    else xml->txt = realloc(xml->txt, tsz + depth + parent_depth + 3);
 
     txt = xml->txt + tsz;
-    memset(txt, c, depth);
-    txt += depth;
+    while (txt > xml->txt && *txt != '\n') --txt;
     *txt++ = '\n';
     memset(txt, c, depth);
     txt += depth;
+    off = txt - xml->txt;
+    *txt++ = '\n';
+    memset(txt, c, parent_depth);
+    txt += parent_depth;
     *txt = '\0';
 
-    return ezxml_add_child(xml, name, tsz + depth);
+    return ezxml_add_child(xml, name, off);
 }
 
 // sets the character content for the given tag and returns the tag

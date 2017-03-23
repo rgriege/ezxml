@@ -37,6 +37,15 @@
 #include <sys/stat.h>
 #include "ezxml.h"
 
+// NOTE(rgriege): compatability
+#if defined(_MSC_VER) && !defined(ezxml_strdup)
+char *ezxml_strdup(const char *s)
+{
+	char *res = malloc(strlen(s) + 1);
+	strcpy(res, s);
+	return res;
+}
+#endif
 
 // NOTE(rgriege): compatability
 // http://stackoverflow.com/questions/2915672/snprintf-and-visual-studio-2010

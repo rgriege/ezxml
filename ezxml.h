@@ -35,15 +35,9 @@ extern "C" {
 #endif
 
 
-#ifndef ezxml_strup
+#ifndef ezxml_strdup
 #ifdef _WIN32
-static char *_ezxml_strdup(const char *s)
-{
-	char *res = malloc(strlen(s) + 1);
-	strcpy(res, s);
-	return res;
-}
-#define ezxml_strdup _ezxml_strdup
+char *ezxml_strdup(const char *s);
 #else
 #define ezxml_strdup strdup
 #endif

@@ -243,8 +243,8 @@ char *ezxml_decode(char *s, char **ent, char t)
                  b += 2); // find entity in entity list
 
             if (ent[b++]) { // found a match
-                if ((c = strlen(ent[b])) - 1 > (e = strchr(s, ';')) - s) {
-                    l = (d = (s - r)) + c + strlen(e); // new length
+                if ((c = (long)strlen(ent[b])) - 1 > (e = strchr(s, ';')) - s) {
+                    l = (d = (s - r)) + c + (long)strlen(e); // new length
                     r = (r == m) ? strcpy(malloc(l), r) : realloc(r, l);
                     e = strchr((s = r + d), ';'); // fix up pointers
                 }
@@ -260,7 +260,7 @@ char *ezxml_decode(char *s, char **ent, char t)
 
     if (t == '*') { // normalize spaces for non-cdata attributes
         for (s = r; *s; s++) {
-            if ((l = strspn(s, " "))) memmove(s, s + l, strlen(s + l) + 1);
+            if ((l = (long)strspn(s, " "))) memmove(s, s + l, strlen(s + l) + 1);
             while (*s && *s != ' ') s++;
         }
         if (--s >= r && *s == ' ') *s = '\0'; // trim any trailing space
@@ -976,7 +976,7 @@ ezxml_t ezxml_set_txt(ezxml_t xml, const char *txt)
 // of NULL will remove the specified attribute. Returns the tag given.
 ezxml_t ezxml_set_attr(ezxml_t xml, const char *name, const char *value)
 {
-    int l = 0, c;
+    size_t l = 0, c;
 
     if (! xml) return NULL;
     while (xml->attr[l] && strcmp(xml->attr[l], name)) l += 2;
